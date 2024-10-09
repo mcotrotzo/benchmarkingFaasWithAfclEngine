@@ -9,7 +9,6 @@
 /.terraform
 /terraform.tfstate.backup
 /terraform.tfstate
-/src/invoker/workflowData/
 /src/invoker/config.json
 /src/invoker/credentials.json
 /src/invoker/dataManager/config.json
