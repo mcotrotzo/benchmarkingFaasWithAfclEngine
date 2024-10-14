@@ -134,7 +134,6 @@ collection={os.getenv('MONGO_COLLECTION')}
 username={os.getenv('MONGO_INITDB_ROOT_USERNAME')}
 password={os.getenv('MONGO_INITDB_ROOT_PASSWORD')}
 """
-
     with open('src/invoker/mongoDatabase.properties', 'w') as mongo_file:
         mongo_file.write(mongo_properties.strip())
     with open('src/invoker/dataManager/config.json', 'w') as mongo_file:

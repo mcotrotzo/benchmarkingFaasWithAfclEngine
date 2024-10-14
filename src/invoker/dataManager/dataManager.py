@@ -62,7 +62,21 @@ def extract_region_provider_execution_from_input(workflow_input):
     execution = parsed_data['execution']
 
     return region, provider, execution
+def checkkColderColdstart(rtt):
+    return ((rtt['coldStart']==1) and (rtt['serviceTime'] >= 5000) and (rtt['provider']=='GCP') and (rtt['functionName']!='recognition'))
 
+def check_delayedwarmstart(row, group):
+        
+        return (row['coldStart'] == 0) and (row['startExecutionTime'] >= group['endExecutionTime'].min())
+
+def markDelayedWarmstarts(data):
+
+    data['startMode'] = data.apply(
+        lambda x: 'delayedWarm' if check_delayedwarmstart(x, data[(data['provider'] == x['provider'])&(data['execution'] == x['execution'])&(data['timeOfDay'] == x['timeOfDay'])&(data['region'] == x['region'])&(data['concurrentFunctions'] == x['concurrentFunctions'])])
+        else 'colderColdStart' if checkkColderColdstart(x) else x['coldStart'], axis=1
+    )
+  
+    return data
 def createDatabase(database_url):
     engine = create_engine(database_url)
     if database_exists(engine.url):
@@ -127,8 +141,8 @@ def save_as_sql(collection:pd.DataFrame,engine):
 
             empty_data_frame.append(func_execution_record)
     output = pd.DataFrame(empty_data_frame)
-    print(output)
     if not output.empty:
+        
         output.to_sql("workflows", con=engine, if_exists='replace', index=False)
     else:
         print("DataFrame is empty; nothing to insert.")
@@ -156,9 +170,15 @@ def tranformData():
 
         collection_data = mn.read_collection(mongo_config['collection'])
         df = pd.DataFrame(collection_data)
+        if df.empty:
+            print("MongoDB is empty you have to run experiments or check the properties file!")
+            raise ValueError("MongoDB is empty you have to run experiments or check the properties file!")
+            return
         sql_config = config['sql']
         DATABASE_URL = f"mysql+pymysql://{sql_config['username']}:{sql_config['password']}@{sql_config['host']}:{sql_config['port']}/{sql_config['db_name']}"
         save_as_sql(df,createDatabase(DATABASE_URL))
+        
+        
 
 if __name__ == '__main__':
     tranformData()

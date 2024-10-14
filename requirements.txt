@@ -46,3 +46,12 @@ python-terraform==0.13.1
 SQLAlchemy==2.0.35
 SQLAlchemy-Utils==0.41.2
 python-dotenv==1.0.1
+streamlit==1.39.0
+streamlit-ace==0.1.1
+streamlit-antd==0.8.3
+streamlit-embeded==0.0.1
+streamlit-file-browser==3.2.22
+streamlit-molstar==0.4.21
+streamlit_dynamic_filters==0.1.9
+SQLAlchemy==2.0.35
+SQLAlchemy-Utils==0.41.2

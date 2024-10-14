@@ -1,8 +1,9 @@
 import argparse
 import os
 from src.deployer.deployer import deploy,destroy
-from src.analyzer.anaylzer import open_jupyter_notebook
+import subprocess
 from src.invoker.scriptExperiment import runExperiment
+import streamlit as st
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
@@ -27,7 +28,8 @@ def tool():
     if mode == 'invoke' or mode=='all':
         runExperiment()
     if mode=='analyze' or mode=='all':
-        open_jupyter_notebook()
+        
+        subprocess.run(['streamlit','run','./src/analyzer/anaylzer.py'])
 
 if __name__ == "__main__":
     tool()

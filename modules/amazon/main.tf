@@ -106,8 +106,7 @@ resource "aws_lambda_function" "lambda_functions" {
 module "workflow" {
   source = "../workflow_module"
   for_each = { for func in var.functions: func.name => func }
-
-  inputBucketFileAddress = "s3://${aws_s3_bucket.input_file_test_bucket[0].bucket}/"
+  inputBucketFileAddress = "https://${aws_s3_bucket.input_file_test_bucket[0].bucket}.s3.amazonaws.com/"
 
 
   additional_input_params = each.value.additional_input_params

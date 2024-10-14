@@ -40,9 +40,9 @@ class ConfigManager:
                             name=function['name'],
                             timeout=function['timeout'],
                             memory=function['memory'],
-                            use_output_bucket=function['useOutputBucket'] if 'useOutputBucket' in keys else False,
+                            use_output_bucket=function['useOutputBucket'] if 'useOutputBucket' in keys and 'inputFilesFolderPath' in keys else False,
                             input_files_folder_path=function['inputFilesFolderPath'] if 'inputFilesFolderPath' in keys else '',
-                            input_files=function['inputFiles'] if 'inputFiles' in keys else [
+                            input_files=function['inputFiles'] if 'inputFiles' in keys and 'inputFilesFolderPath' in keys  else [
                             ],
 
                             additional_output_parameters=self.select_by_type(output_params),
