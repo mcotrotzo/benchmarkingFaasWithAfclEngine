@@ -7,6 +7,7 @@ from sqlalchemy_utils import database_exists, create_database,drop_database
 import json
 import pandas as pd
 import os
+import logging
 
 @dataclass
 class MongoDBConnection:
@@ -145,7 +146,8 @@ def save_as_sql(collection:pd.DataFrame,engine):
         
         output.to_sql("workflows", con=engine, if_exists='replace', index=False)
     else:
-        print("DataFrame is empty; nothing to insert.")
+
+        logging.info("DataFrame is empty or there is no successful function execution; The sql database is only filled with successful executions.")
 
 
 

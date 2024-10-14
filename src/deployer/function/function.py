@@ -29,8 +29,7 @@ class Function:
                  timeout: int, 
                  memory: int, 
                  handler: str, 
-                 runtime: str, 
-                 input_files_folder_path: str, 
+                 runtime: str,
                  input_files: List[str],
                  use_output_bucket:bool,
                  additional_input_parameters: list[dict],
@@ -42,7 +41,6 @@ class Function:
         self.memory = memory
         self.handler = handler
         self.runtime = runtime
-        self.input_files_folder_path = input_files_folder_path
         self.input_files = input_files
         self.additional_input_parameters = additional_input_parameters  
         self.additional_output_parameters = additional_output_parameters

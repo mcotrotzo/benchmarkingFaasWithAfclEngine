@@ -15,7 +15,6 @@ variable "functions" {
     archive                  = string
     memory                   = number
     timeout                  = number
-    inputFilesFolderPath     = string
     concurrency = number
     repetition =number
     inputFiles               = list(string)
@@ -46,7 +45,7 @@ resource "google_storage_bucket" "deployment_bucket" {
 }
 
 resource "google_storage_bucket" "input_file_test_bucket" {
-  count = length([for func in var.functions : func if func.inputFilesFolderPath != ""]) > 0 ? 1 : 0
+  count = length([for func in var.functions : func if length(func.inputFiles) > 0]) > 0 ? 1 : 0
   name          = "inputfilestestbucket-${var.region}${random_id.region.hex}"
   location      = var.region
   force_destroy = true
@@ -58,8 +57,8 @@ locals {
     for func in var.functions : [
       for file in func.inputFiles : {
         func_name  = func.name
-        file_name  = file
-        file_path  = "${abspath(path.root)}/${func.inputFilesFolderPath}/${file}"
+        file_name  = basename(file)
+        file_path  = file
       }
     ]
   ])
@@ -148,7 +147,7 @@ module "workflow" {
   prov                    = "GCP"
   region                  = var.region
   useOutPutBucket         = each.value.useOutputBucket
-  inputFiles              = each.value.inputFiles
+  inputFiles              = [for file in each.value.inputFiles : basename(file)]
   concurrency = each.value.concurrency
   repetition = each.value.repetition
 }

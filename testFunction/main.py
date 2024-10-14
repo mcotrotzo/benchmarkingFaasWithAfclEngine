@@ -1,6 +1,6 @@
 import json
 import requests
-def test_function(request):
+def test_function(event, context):
     request_json = request.get_json()
     print(request_json)
 

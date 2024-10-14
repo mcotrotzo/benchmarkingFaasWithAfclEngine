@@ -3,7 +3,7 @@ from src.deployer.credentials.credentials import AWSCredentials
 from src.deployer.function.function import Function
 from typing import Dict, List
 import uuid
-
+import json
 class awsProvider(baseCloud):
     def __init__(self, credentials: AWSCredentials, region_func: Dict[str, List[Function]], 
                  module_folder_name: str) -> None:
@@ -36,8 +36,7 @@ module "{region}" {{
       archive                  = "{function.archive}"
       memory                   = {function.memory}
       timeout                  = {function.timeout}
-      inputFilesFolderPath     = "{function.input_files_folder_path}"
-      inputFiles               = [{', '.join(f'"{file}"' for file in function.input_files)}]
+      inputFiles               = {json.dumps(function.input_files)}
       additional_input_params   = {function.additional_input_parameters}
       additional_output_params  = {function.additional_output_parameters}
       useOutputBucket          = {"true" if function.use_output_bucket else "false"}

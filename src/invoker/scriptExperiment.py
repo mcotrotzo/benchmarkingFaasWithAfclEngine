@@ -1,6 +1,7 @@
 import subprocess
 import os
 import json
+import logging
 from src.invoker.dataManager.dataManager import tranformData
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -37,8 +38,11 @@ def runner(workflow, input_json:str):
     for rep in range(repetition):
         input_file = save_input_with_execution(input_dict=input_dict, execution=rep+1)
         command = ["java", "-jar", "ee.jar", f'./workflowData/{workflow}', input_file]
-        subprocess.run(command)
-        print(command)
+        try:
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            logging.error(f"AFCL failed with exit code {e.returncode}: {e}")
+            raise
 
 
 def runExperiment():

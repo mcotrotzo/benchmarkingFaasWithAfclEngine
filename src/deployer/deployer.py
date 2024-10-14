@@ -70,17 +70,21 @@ class TerraformManager():
         self.maintf+=required_providertf
 
     def save_provider_content_as_tf_file(self, content: list[str], name: str):
-
-
         existing_content = ''
         if os.path.exists(name):
             with open(name, 'r') as file:
                 existing_content = file.read()
-        for prov in content:
-            if prov not in existing_content:
-                existing_content+=prov
+        existing_lines = existing_content.strip()
 
-        self.save_content_as_tf_file(existing_content,name)
+        for prov in content:
+
+            prov = prov.strip()
+            if not prov in existing_lines:
+                print(prov)
+                print(existing_lines)
+                existing_lines += "\n"+prov
+
+        self.save_content_as_tf_file(existing_lines, name)
 
 
     def save_content_as_tf_file(self, content: str, name: str):

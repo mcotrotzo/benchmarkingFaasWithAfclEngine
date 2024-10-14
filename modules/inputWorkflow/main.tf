@@ -38,10 +38,10 @@ locals {
     },
     {
       for file in var.inputFiles :
-      split(".", file)[0] => jsonencode("${var.inputBucketFileAddress}/${file}")
+      split(".", file)[0] => jsonencode("${var.inputBucketFileAddress}${file}")
     },
     {
-      outputBucket = var.useOutPutBucket ? jsonencode("${var.inputBucketFileAddress}/") : jsonencode(false)
+      outputBucket = var.useOutPutBucket ? jsonencode("${var.inputBucketFileAddress}") : jsonencode(false)
     }
   )
 }

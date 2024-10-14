@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 import json
 from abc import ABC, abstractmethod
+from typing import Optional
 
+from pydantic import BaseModel
 
 @dataclass
 class Credentials(ABC):
@@ -22,7 +24,7 @@ class Credentials(ABC):
         return data
 
 
-# AWS Credentials class
+
 @dataclass
 class AWSCredentials(Credentials):
     access_key: str = ""
