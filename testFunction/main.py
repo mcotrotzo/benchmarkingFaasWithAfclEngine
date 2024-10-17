@@ -1,34 +1,31 @@
 import json
-import requests
-def test_function(event, context):
-    request_json = request.get_json()
-    print(request_json)
-
-    language = request_json.get('language', '')
-    input_file_characters = request_json.get('inputFileCharacters', 0)
-    input_file_size = request_json.get('inputFileSize', 0)
 
 
+def lambda_handler(request, context):
 
-    test_collection_of_int = request_json.get('testCollectionOfInt', [])
-    test_collection_of_string = request_json.get('testCollectionOfString', [])
-    test_collection_of_bool = request_json.get('testCollectionOfBool', [])
+    language = request.get('language', '')
+    input_file_characters = request.get('inputFileCharacters', 0)
+    input_file_size = request.get('inputFileSize', 0)
 
 
 
+    test_collection_of_int = request.get('testCollectionOfInt', [])
+    test_collection_of_string = request.get('testCollectionOfString', [])
+    test_collection_of_bool = request.get('testCollectionOfBool', [])
+
+
+    gg = testValueAndInput(language,input_file_characters,input_file_size,test_collection_of_int,test_collection_of_string,test_collection_of_bool)
+    return {
+        'statusCode': 200,
+        'succeed': f'{gg["succeed"]}'
+    }
 
 
 
-    result = testValueAndInput(input_file_size, input_file_characters, language,
-                               test_collection_of_int, test_collection_of_string,
-                               test_collection_of_bool)
 
-    return json.dumps(result), 200
 def testValueAndInput(input_file_size, input_file_characters, language, test_collection_of_int,
-                      test_collection_of_string, test_collection_of_bool,
-                      ):
+                      test_collection_of_string, test_collection_of_bool):
     results = {}
-
 
     results['input_file_size'] = {
         'value': input_file_size,
@@ -59,7 +56,6 @@ def testValueAndInput(input_file_size, input_file_characters, language, test_col
         'value': test_collection_of_bool,
         'is_valid': isinstance(test_collection_of_bool, list) and all(isinstance(i, bool) for i in test_collection_of_bool)
     }
-
 
     all_valid = all(res['is_valid'] for res in results.values())
 

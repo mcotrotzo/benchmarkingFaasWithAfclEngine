@@ -173,9 +173,9 @@ def tranformData():
         collection_data = mn.read_collection(mongo_config['collection'])
         df = pd.DataFrame(collection_data)
         if df.empty:
-            print("MongoDB is empty you have to run experiments or check the properties file!")
+
             raise ValueError("MongoDB is empty you have to run experiments or check the properties file!")
-            return
+
         sql_config = config['sql']
         DATABASE_URL = f"mysql+pymysql://{sql_config['username']}:{sql_config['password']}@{sql_config['host']}:{sql_config['port']}/{sql_config['db_name']}"
         save_as_sql(df,createDatabase(DATABASE_URL))

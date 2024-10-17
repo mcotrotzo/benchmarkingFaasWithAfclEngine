@@ -3,165 +3,8 @@
         {
 
             "name": "TestFunction",
-            "archive": "my_cloud_function.zip",
+            "archive": "C:/Users/MarcoCotrotzo/IdeaProjects/benchmarkingFaasWithAfclEngine/my_lambda_function.zip",
             "timeout": 500,
-            "memory": 512,
-            "inputFiles": [
-                "inputFile.txt"
-            ],
-            "useBucket": {
-                "useAsOutPutBucket": true,
-                "useAsInputBucket": true,
-                "inputFilePaths": [
-                    "inputFIles/inputFile.txt"
-                ]
-            },
-            "additionalInputParameters": [
-                { "name": "language", "type": "string", "value": "en-US" },
-                { "name": "inputFileCharacters", "type": "number", "value": 3000 },
-                { "name": "inputFileSize", "type": "number", "value": 3000 },
-                {"name": "testCollectionOfInt", "type": "collection","value": [1,2,4]},
-                {"name": "testCollectionOfString", "type": "collection","value": ["3","3","5"]},
-                {"name": "testCollectionOfBool", "type": "collection","value": [true,false,true]}
-
-            ],
-            "additionalOutputParameters": [
-                { "name": "succeed", "type": "bool" }
-
-            ],
-            "providers": [
-                {
-                    "name": "AWS",
-                    "regions": [
-                        { "name": "us-east-1", "concurrency": 1,"repetition": 1 },
-                        { "name": "us-west-2", "concurrency": 1,"repetition": 4 }
-                    ],
-                    "handler": "main.test_function",
-                    "runtime": "python3.10"
-                }
-            ]
-        },
-        {
-
-            "name": "TestFunction2",
-            "archive": "my_cloud_function.zip",
-            "timeout": 300,
-            "memory": 512,
-            "inputFiles": [
-                "inputFile.txt"
-            ],
-            "useBucket": {
-                "useAsOutPutBucket": true,
-                "useAsInputBucket": false
-            },
-            "additionalInputParameters": [
-                { "name": "language", "type": "string", "value": "en-US" },
-                { "name": "inputFileCharacters", "type": "number", "value": 3000 },
-                { "name": "inputFileSize", "type": "number", "value": 3000 },
-                {"name": "testCollectionOfInt", "type": "collection","value": [1,2,4]},
-                {"name": "testCollectionOfString", "type": "collection","value": ["3","3","5"]},
-                {"name": "testCollectionOfBool", "type": "collection","value": [true,false,true]}
-
-            ],
-            "additionalOutputParameters": [
-                { "name": "succeed", "type": "bool" }
-
-            ],
-            "providers": [
-                {
-                    "name": "AWS",
-                    "regions": [
-                        { "name": "us-east-1", "concurrency": 1,"repetition": 1 },
-                        { "name": "us-west-2", "concurrency": 1,"repetition": 4 }
-                    ],
-                    "handler": "main.test_function",
-                    "runtime": "python3.10"
-                }
-            ]
-        },
-        {
-
-            "name": "TestFunction3",
-            "archive": "my_cloud_function.zip",
-            "timeout": 300,
-            "memory": 512,
-            "inputFiles": [
-                "inputFile.txt"
-            ],
-            "useBucket": {
-                "useAsOutPutBucket": true,
-                "useAsInputBucket": false
-            },
-            "inputFilesFolderPath": "/inputFIles",
-            "additionalInputParameters": [
-                { "name": "language", "type": "string", "value": "en-US" },
-                { "name": "inputFileCharacters", "type": "number", "value": 3000 },
-                { "name": "inputFileSize", "type": "number", "value": 3000 },
-                {"name": "testCollectionOfInt", "type": "collection","value": [1,2,4]},
-                {"name": "testCollectionOfString", "type": "collection","value": ["3","3","5"]},
-                {"name": "testCollectionOfBool", "type": "collection","value": [true,false,true]}
-
-            ],
-            "additionalOutputParameters": [
-                { "name": "succeed", "type": "bool" }
-
-            ],
-            "providers": [
-                {
-                    "name": "AWS",
-                    "regions": [
-                        { "name": "us-east-1", "concurrency": 1,"repetition": 1 },
-                        { "name": "us-west-2", "concurrency": 1,"repetition": 4 }
-                    ],
-                    "handler": "main.test_function",
-                    "runtime": "python3.10"
-                }
-            ]
-        },
-        {
-
-            "name": "TestFunction4",
-            "archive": "my_cloud_function.zip",
-            "timeout": 300,
-            "memory": 512,
-            "inputFiles": [
-                "inputFile.txt"
-            ],
-            "useBucket": {
-                "useAsOutPutBucket": true,
-                "useAsInputBucket": false
-            },
-            "inputFilesFolderPath": "/inputFIles",
-            "additionalInputParameters": [
-                { "name": "language", "type": "string", "value": "en-US" },
-                { "name": "inputFileCharacters", "type": "number", "value": 3000 },
-                { "name": "inputFileSize", "type": "number", "value": 3000 },
-                {"name": "testCollectionOfInt", "type": "collection","value": [1,2,4]},
-                {"name": "testCollectionOfString", "type": "collection","value": ["3","3","5"]},
-                {"name": "testCollectionOfBool", "type": "collection","value": [true,false,true]}
-
-            ],
-            "additionalOutputParameters": [
-                { "name": "succeed", "type": "bool" }
-
-            ],
-            "providers": [
-                {
-                    "name": "AWS",
-                    "regions": [
-                        { "name": "us-east-1", "concurrency": 1,"repetition": 1 },
-                        { "name": "us-west-2", "concurrency": 1,"repetition": 4 }
-                    ],
-                    "handler": "main.test_function",
-                    "runtime": "python3.10"
-                }
-            ]
-        },
-        {
-
-            "name": "TestFunction1",
-            "archive": "my_cloud_function.zip",
-            "timeout": 300,
             "memory": 512,
             "inputFiles": [
                 "inputFile.txt"
@@ -169,15 +12,12 @@
             "useBucket": {
                 "useAsOutPutBucket": false,
                 "useAsInputBucket": false
+
             },
-            "inputFilesFolderPath": "/inputFIles",
             "additionalInputParameters": [
                 { "name": "language", "type": "string", "value": "en-US" },
                 { "name": "inputFileCharacters", "type": "number", "value": 3000 },
-                { "name": "inputFileSize", "type": "number", "value": 3000 },
-                {"name": "testCollectionOfInt", "type": "collection","value": [1,2,4]},
-                {"name": "testCollectionOfString", "type": "collection","value": ["3","3","5"]},
-                {"name": "testCollectionOfBool", "type": "collection","value": [true,false,true]}
+                { "name": "inputFileSize", "type": "number", "value": 3000 }
 
             ],
             "additionalOutputParameters": [
@@ -191,7 +31,7 @@
                         { "name": "us-east-1", "concurrency": 1,"repetition": 1 },
                         { "name": "us-west-2", "concurrency": 1,"repetition": 4 }
                     ],
-                    "handler": "test_function",
+                    "handler": "main.lambda_handler",
                     "runtime": "python3.10"
                 }
             ]

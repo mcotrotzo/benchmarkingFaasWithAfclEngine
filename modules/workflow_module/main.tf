@@ -122,7 +122,7 @@ locals {
 
 
 resource "local_file" "workflow_yaml" {
-  filename   = "${path.module}/../../src/invoker/workflowData/${var.prov}_${var.region}_${var.funcName}.yaml"
+  filename   = "${path.module}/../../../src/invoker/workflowData/${var.prov}_${var.region}_${var.funcName}.yaml"
   content    = <<EOF
 name: "${var.funcName}Experiment"
 dataIns:
@@ -225,7 +225,7 @@ module "input" {
   region                  = var.region
   repetition              = var.repetition
   useOutPutBucket         = var.useOutPutBucket
-  jsonPath = "${path.module}/../../src/invoker/workflowData/${var.prov}_${var.region}_${var.funcName}.json"
+  jsonPath = "${path.module}/../../../src/invoker/workflowData/${var.prov}_${var.region}_${var.funcName}.json"
   additional_input_params = var.additional_input_params
 }
 

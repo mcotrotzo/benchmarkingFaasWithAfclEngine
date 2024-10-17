@@ -86,8 +86,8 @@ data "archive_file" "function_deployment_package" {
   }
 
   type        = "zip"
-  source_file = "${abspath(path.root)}/${each.value.archive}"
-  output_path = "${abspath(path.root)}/${trimsuffix(each.value.archive, ".jar")}.zip"
+  source_file = "${each.value.archive}"
+  output_path = "${trimsuffix(each.value.archive, ".jar")}.zip"
 }
 
 resource "google_storage_bucket_object" "deployment_packages" {
@@ -95,7 +95,7 @@ resource "google_storage_bucket_object" "deployment_packages" {
 
   bucket = google_storage_bucket.deployment_bucket.name
   name   = "${each.key}.zip"
-  source = endswith(each.value.archive, ".zip") ? "${abspath(path.root)}/${each.value.archive}" : data.archive_file.function_deployment_package[each.key].output_path
+  source = endswith(each.value.archive, ".zip") ? "${each.value.archive}" : data.archive_file.function_deployment_package[each.key].output_path
 
   timeouts {
     create = "60m"
@@ -136,7 +136,7 @@ module "workflow" {
   for_each = { for func in var.functions : func.name => func }
 
 
-  inputBucketFileAddress = "https://storage.cloud.google.com/${google_storage_bucket.input_file_test_bucket[0].name}"
+  inputBucketFileAddress = length(google_storage_bucket.input_file_test_bucket) > 0?"https://storage.cloud.google.com/${google_storage_bucket.input_file_test_bucket[0].name}":""
 
 
 

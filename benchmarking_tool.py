@@ -5,9 +5,10 @@ import subprocess
 from src.invoker.scriptExperiment import runExperiment
 import logging
 import streamlit as st
-logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-script_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_dir)
+from os.path import join, dirname
+from pathlib import Path
+
+from src.utils.utils import handle_error
 
 def parse_input():
     parser = argparse.ArgumentParser()
@@ -21,22 +22,29 @@ def parse_input():
 
 def tool():
     mode = parse_input()
+    dir_path =  Path(__file__).parent
+    terr_path = dir_path / 'terraform/'
     if mode  == 'destroy':
-        destroy()
-        return
+        try:
+            destroy(dest_terraform_path_folder=terr_path)
+            return
+        except Exception as e:
+            handle_error(e)
+            return
 
     if mode == 'deploy' or mode=='all':
         try:
-            deploy()
+            deploy(dest_terraform_path_folder=terr_path)
+            print("Herer")
         except Exception as e:
-            logging.error(e)
+            handle_error(e)
             return
 
     if mode == 'invoke' or mode=='all':
         try:
             runExperiment()
         except Exception as e:
-            logging.error(e)
+            handle_error()
             return
     if mode=='analyze' or mode=='all':
         subprocess.run(['streamlit','run','./src/analyzer/anaylzer.py'])

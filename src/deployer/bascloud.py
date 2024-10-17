@@ -24,8 +24,4 @@ class baseCloud(ABC):
         with open(f"{path_to_module_folder}/{self.module_folder_name}/{name_of_module_file}.tf", "w") as outfile:
             outfile.write(content)
 
-    def additionalParameterHelper(self,type:str,value):
-        if type == 'string':
-            return str(value)
-        else:
-            return value
+ 

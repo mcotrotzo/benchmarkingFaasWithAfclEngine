@@ -45,7 +45,7 @@ def getTimeLinePlots(data: pd.DataFrame, x_start:str,x_end:str ,y:str, color: st
     )
 
     fig.update_yaxes(autorange="reversed")
-    fig.for_each_yaxis(lambda yaxis: yaxis.update(showticklabels=True))
+    fig.for_each_yaxis(lambda yaxis: yaxis.update(showticklabels=True,matches = None))
 
     fig.update_traces(textposition='none', 
                       insidetextanchor='end')

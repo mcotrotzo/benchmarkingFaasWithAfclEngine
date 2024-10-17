@@ -1,6 +1,6 @@
-from src.deployer.function.function import Function, Parameter, OutputParameter
+from ..function.function import Function
 import json
-from typing import Dict, Union
+from ...utils.utils import handle_error,load_config,save_json
 import os
 import logging
 
@@ -10,7 +10,7 @@ import logging
 from jsonschema import validate, ValidationError, SchemaError
 
 class ConfigManager:
-    # Load JSON schema
+    
     SCHEMA = {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
@@ -139,18 +139,15 @@ class ConfigManager:
 
 
     def __loadFromJson(self, config_json: str) -> dict:
-        try:
-            if not os.path.exists(config_json):
-                logging.error(f"Configuration file {config_json} does not exist.")
-                raise FileNotFoundError(f"Configuration file {config_json} not found.You need a config.json file with the following schema:{self.SCHEMA}")
-
-            with open(config_json, 'r') as file:
-                config = json.load(file)
+            try:
+                config = load_config(config_json)
+            except FileNotFoundError as e:
+                handle_error(f"Config file not found {config_json}")
+            except Exception as e:
+                handle_error(f"Error occured loading config file {e}")
+                
             logging.info(f"Successfully loaded configuration from {config_json}.")
             return config
-        except Exception as e:
-            logging.error(f"An error occurred while loading configuration: {e}")
-            raise
 
     def parse_config(self, config_input: str) -> dict:
         try:
@@ -197,8 +194,8 @@ class ConfigManager:
                             memory=function['memory'],
                             use_output_bucket=use_output_bucket,
                             input_files = input_file_paths,
-                            additional_output_parameters=self.select_by_type(function['additionalOutputParameters']),
-                            additional_input_parameters=self.select_by_type(function['additionalInputParameters']),
+                            additional_output_parameters=self.select_by_type(function.get('additionalOutputParameters',[])),
+                            additional_input_parameters=self.select_by_type(function.get('additionalInputParameters',[])),
                             concurrency=region.get('concurrency', 1),
                             repetition=region.get('repetition', 1)
                         )
@@ -209,13 +206,11 @@ class ConfigManager:
             return deployment_dict
 
         except ValidationError as e:
-            logging.error(f"Validation error in configuration: {e.message}")
-            raise
+            handle_error(f"Validation error in configuration: {e.message}")
         except SchemaError as e:
-            logging.error(f"Schema error: {e.message}")
-            raise
+            handle_error(f"Schema error: {e.message}")
         except Exception as e:
-            logging.error(f"An error occurred while parsing configuration: {e}")
+            handle_error(f"An error occurred while parsing configuration: {e}")
 
 
     def select_by_type(self, input_params):

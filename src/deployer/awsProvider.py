@@ -1,6 +1,6 @@
-from src.deployer.bascloud import baseCloud
-from src.deployer.credentials.credentials import AWSCredentials
-from src.deployer.function.function import Function
+from .bascloud import baseCloud
+from .credentials.credentials import AWSCredentials
+from .function.function import Function
 from typing import Dict, List
 import uuid
 import json
@@ -12,7 +12,6 @@ class awsProvider(baseCloud):
 
     def module_call_tf(self):
         res = ''
-        random_stack_id = uuid.uuid4().hex
         
 
         for region, functions in self.region_func.items():

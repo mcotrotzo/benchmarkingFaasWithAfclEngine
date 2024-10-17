@@ -80,8 +80,8 @@ resource "aws_s3_object" "deployment_packages" {
 
   key    = "${each.key}.${endswith(each.value.archive, ".jar") ? "jar" : "zip"}"
   acl    = "private"
-  source = "${abspath(path.root)}/${each.value.archive}"
-  etag   = filemd5("${abspath(path.root)}/${each.value.archive}")
+  source = "${each.value.archive}"
+  etag   = filemd5("${each.value.archive}")
 }
 
 resource "aws_lambda_function" "lambda_functions" {
@@ -105,7 +105,7 @@ resource "aws_lambda_function" "lambda_functions" {
 module "workflow" {
   source = "../workflow_module"
   for_each = { for func in var.functions: func.name => func }
-  inputBucketFileAddress = "https://${aws_s3_bucket.input_file_test_bucket[0].bucket}.s3.amazonaws.com/"
+  inputBucketFileAddress = length(aws_s3_bucket.input_file_test_bucket) > 0 ? "https://${aws_s3_bucket.input_file_test_bucket[0].bucket}.s3.amazonaws.com/":""
 
 
   additional_input_params = each.value.additional_input_params
