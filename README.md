@@ -69,6 +69,8 @@ The `config.json` file allows you to configure key parameters for deploying and 
         - **`name`** (required, string): The name of the input parameter.
         - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `boolean`).
         - **`value`** (required, string/number/boolean/array/object): The value of the input parameter.
+      > **Note:**
+      > - The values are passed to the request as a parameter with a key. The key is the `name` property,
 
     - **`additionalOutputParameters`** (optional, array): A list of custom output parameters, defined similarly to input parameters:
         - **`name`** (required, string): The name of the output parameter.
