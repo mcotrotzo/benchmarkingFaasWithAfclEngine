@@ -33,7 +33,7 @@ def markDelayedWarmstarts(data):
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('../src/analyzer/experiments/experiments20241019-165156.csv')
+    df = pd.read_csv('../experiments/experiments20241019-165156.csv')
     print(df)
     df = calculateTimeOfDay(df)
     df = markDelayedWarmstarts(df)

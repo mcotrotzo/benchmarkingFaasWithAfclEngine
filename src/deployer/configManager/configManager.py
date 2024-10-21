@@ -143,8 +143,10 @@ class ConfigManager:
                 config = load_config(config_json)
             except FileNotFoundError as e:
                 handle_error(f"Config file not found {config_json}")
+                return
             except Exception as e:
                 handle_error(f"Error occured loading config file {e}")
+                return
                 
             logging.info(f"Successfully loaded configuration from {config_json}.")
             return config
