@@ -25,7 +25,7 @@
 
       ],
       "additionalOutputParameters": [
-        { "name": "not present", "type": "bool" }
+        { "name": "succeed", "type": "bool" }
 
       ],
       "providers": [
