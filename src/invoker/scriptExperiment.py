@@ -14,15 +14,16 @@ def get_input_json(input_json: str):
     return load_config(script_dir / 'workflowData/' / input_json )
 
 def save_input_with_execution(input_dict: dict, execution: int):
+    input_dict = dict.copy(input_dict)
     input_dict['execution'] = execution
 
     for key, value in input_dict.items():
         if isinstance(value, str):
             try:
                 input_dict[key] = json.loads(value)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
                 input_dict[key] = value
-                sys.exit(f"Json decoding of {input_dict} failed!")
+                sys.exit(f"Json decoding of key {key} with value {value}, {e} failed!")
 
     save_json(input_dict,script_dir / 'runInput.json',mode='w')
 

@@ -44,9 +44,9 @@ resource "google_storage_bucket" "deployment_bucket" {
   force_destroy = true
 }
 
-resource "google_storage_bucket" "input_file_test_bucket" {
-  count = length([for func in var.functions : func if length(func.inputFiles) > 0]) > 0 ? 1 : 0
-  name          = "inputfilestestbucket-${var.region}${random_id.region.hex}"
+resource "google_storage_bucket" "bucket" {
+  count = length([for func in var.functions : func if (length(func.inputFiles) > 0) || func.useOutputBucket]) > 0 ? 1 : 0
+  name          = "bucket-data-${var.region}${random_id.region.hex}"
   location      = var.region
   force_destroy = true
 }
@@ -67,7 +67,7 @@ locals {
 resource "google_storage_bucket_object" "input_files" {
   for_each = { for idx, file in local.input_files : "${file.func_name}-${file.file_name}" => file }
 
-  bucket = google_storage_bucket.input_file_test_bucket[0].name
+  bucket = google_storage_bucket.bucket[0].name
   name   = each.value.file_name
   source = each.value.file_path
 
@@ -136,7 +136,7 @@ module "workflow" {
   for_each = { for func in var.functions : func.name => func }
 
 
-  inputBucketFileAddress = length(google_storage_bucket.input_file_test_bucket) > 0?"https://storage.cloud.google.com/${google_storage_bucket.input_file_test_bucket[0].name}":""
+  inputBucketFileAddress = length(google_storage_bucket.bucket) > 0?"https://storage.cloud.google.com/${google_storage_bucket.bucket[0].name}":""
 
 
 

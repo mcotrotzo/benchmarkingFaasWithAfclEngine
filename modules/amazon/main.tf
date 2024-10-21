@@ -45,9 +45,9 @@ resource "aws_s3_bucket" "deployment_bucket" {
   force_destroy = true
 }
 
-resource "aws_s3_bucket" "input_file_test_bucket" {
-  count = length([for func in var.functions : func if length(func.inputFiles) > 0]) > 0 ? 1 : 0
-  bucket        = "inputfilestestbucket-${var.region}"
+resource "aws_s3_bucket" "bucket" {
+  count = length([for func in var.functions : func if (length(func.inputFiles) > 0) || (func.useOutputBucket == true)]) ? 1 : 0
+  bucket        = "bucket_benchmarking_tool_profile_BaaS-${var.region}"
   force_destroy = true
 }
 
@@ -67,7 +67,7 @@ locals {
 resource "aws_s3_object" "input_files" {
   for_each = { for idx, file in local.function_input_files : "${file.func_name}-${file.file_name}" => file }
 
-  bucket = aws_s3_bucket.input_file_test_bucket[0].id
+  bucket = aws_s3_bucket.bucket[0].id
   key    = each.value.file_name
   source = each.value.file_path
   acl    = "private"
@@ -105,7 +105,7 @@ resource "aws_lambda_function" "lambda_functions" {
 module "workflow" {
   source = "../workflow_module"
   for_each = { for func in var.functions: func.name => func }
-  inputBucketFileAddress = length(aws_s3_bucket.input_file_test_bucket) > 0 ? "https://${aws_s3_bucket.input_file_test_bucket[0].bucket}.s3.amazonaws.com/":""
+  inputBucketFileAddress = length(aws_s3_bucket.bucket) > 0 ? "https://${aws_s3_bucket.bucket[0].bucket}.s3.amazonaws.com/":""
 
 
   additional_input_params = each.value.additional_input_params
