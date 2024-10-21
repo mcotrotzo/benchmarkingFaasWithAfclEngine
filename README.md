@@ -67,14 +67,14 @@ The `config.json` file allows you to configure key parameters for deploying and 
 
     - **`additionalInputParameters`** (optional, array): A list of custom input parameters for the function, defined as objects with:
         - **`name`** (required, string): The name of the input parameter.
-        - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `boolean`).
-        - **`value`** (required, string/number/boolean/array/object): The value of the input parameter.
+        - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `bool`).
+        - **`value`** (required, string/number/bool/array/object): The value of the input parameter.
       > **Note:**
       > - The values are passed to the request as a parameter with a key. The key is the `name` property,
 
     - **`additionalOutputParameters`** (optional, array): A list of custom output parameters, defined similarly to input parameters:
         - **`name`** (required, string): The name of the output parameter.
-        - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `boolean`).
+        - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `bool`).
 
       > **Note:**
       > - When you define output parameters, your FaaS should return those parameters with the key name exactly as defined in the `name` property.
