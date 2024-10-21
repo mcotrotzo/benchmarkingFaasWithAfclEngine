@@ -2,15 +2,18 @@
   "functions": [
     {
 
-      "name": "SynthesizeExp",
-      "archive": "my_cloud_function.zip",
+      "name": "TestFunction",
+      "archive": "C:/Users/MarcoCotrotzo/IdeaProjects/benchmarkingFaasWithAfclEngine/my_lambda_function.zip",
       "timeout": 500,
       "memory": 512,
       "inputFiles": [
         "inputFile.txt"
       ],
-      "useOutputBucket": true,
-      "inputFilesFolderPath": "/inputFIles",
+      "useBucket": {
+        "useAsOutPutBucket": true,
+        "useAsInputBucket": false
+
+      },
       "additionalInputParameters": [
         { "name": "language", "type": "string", "value": "en-US" },
         { "name": "inputFileCharacters", "type": "number", "value": 3000 },
@@ -19,20 +22,21 @@
         {"name": "testCollectionOfString", "type": "collection","value": ["3","3","5"]},
         {"name": "testCollectionOfBool", "type": "collection","value": [true,false,true]}
 
+
       ],
       "additionalOutputParameters": [
-        { "name": "succeed", "type": "boolean" }
+        { "name": "not present", "type": "bool" }
 
       ],
       "providers": [
         {
-          "name": "GCP",
+          "name": "AWS",
           "regions": [
-            { "name": "us-east4", "concurrency": 2,"repetition": 1 },
-            { "name": "us-west1", "concurrency": 2,"repetition": 4 }
+            { "name": "us-east-1", "concurrency": 1,"repetition": 1 },
+            { "name": "us-west-2", "concurrency": 1,"repetition": 4 }
           ],
-          "handler": "main.test_function",
-          "runtime": "python3.9"
+          "handler": "main.lambda_handler",
+          "runtime": "python3.10"
         }
       ]
     }
