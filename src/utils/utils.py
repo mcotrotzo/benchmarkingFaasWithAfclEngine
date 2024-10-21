@@ -21,8 +21,8 @@ def save_json(dict:dict,path,mode:str):
         return json.dump(dict, config_file, indent=4)
     
 
-def save_properties_file(file_path, **kwargs):
-    prop = ""
+def save_properties_file(file_path,content:str='',**kwargs):
+    prop = content
     for key, value in kwargs.items():
         print(value)
         prop += f"{key}={value}\n" 

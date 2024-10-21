@@ -24,6 +24,10 @@
 
 
             ],
+            "additionalOutputParameters": [
+                { "name": "not present", "type": "bool" }
+
+            ],
             "providers": [
                 {
                     "name": "AWS",

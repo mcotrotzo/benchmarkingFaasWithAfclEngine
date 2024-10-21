@@ -57,8 +57,8 @@ The `config.json` file allows you to configure key parameters for deploying and 
     - **`memory`** (required, integer): The memory (in MB) allocated to the function.
     - **`useBucket`** (optional, object): Defines whether the function will use a cloud storage bucket for input and/or output. One bucket is created for each region. Contains the following properties:
 
-        - **`useAsOutPutBucket`** (boolean): Set to `true` if the bucket's address will be passed as a parameter to the request. In your FaaS, you can access the bucket with the key `'outputBucket'`.
-        - **`useAsInputBucket`** (boolean): Set to `true` if the bucket will be used to upload input data.
+        - **`useAsOutPutBucket`** (bool): Set to `true` if the bucket's address will be passed as a parameter to the request. In your FaaS, you can access the bucket with the key `'outputBucket'`.
+        - **`useAsInputBucket`** (bool): Set to `true` if the bucket will be used to upload input data.
         - **`inputFilePaths`** (array of strings): Specifies the local file paths that should be uploaded to the input bucket if `useAsInputBucket` is set to `true`.
 
       > **Note:**
@@ -67,12 +67,12 @@ The `config.json` file allows you to configure key parameters for deploying and 
 
     - **`additionalInputParameters`** (optional, array): A list of custom input parameters for the function, defined as objects with:
         - **`name`** (required, string): The name of the input parameter.
-        - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `boolean`).
-        - **`value`** (required, string/number/boolean/array/object): The value of the input parameter.
+        - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `bool`).
+        - **`value`** (required, string/number/bool/array/object): The value of the input parameter.
 
     - **`additionalOutputParameters`** (optional, array): A list of custom output parameters, defined similarly to input parameters:
         - **`name`** (required, string): The name of the output parameter.
-        - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `boolean`).
+        - **`type`** (required, string): The data type (JSON data types) (e.g., `string`, `number`, `bool`).
 
       > **Note:**
       > - When you define output parameters, your FaaS should return those parameters with the key name exactly as defined in the `name` property.

@@ -23,5 +23,6 @@ class baseCloud(ABC):
 
         with open(f"{path_to_module_folder}/{self.module_folder_name}/{name_of_module_file}.tf", "w") as outfile:
             outfile.write(content)
-
- 
+    @abstractmethod
+    def credentials_afcl(self):
+        pass

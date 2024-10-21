@@ -17,7 +17,7 @@ try:
     PASSWORD=get_env('MONGO_INITDB_ROOT_PASSWORD')
     CREDENTIALSPATH = os.path.normpath(get_env('CREDENTIALS_JSON_PATH'))
     CONFIG_PATH =os.path.normpath(get_env('CONFIG_PATH'))
-    print(CONFIG_PATH)
+
 except Exception as e:
     handle_error(e)
     raise
