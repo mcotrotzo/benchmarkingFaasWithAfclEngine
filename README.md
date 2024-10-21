@@ -111,7 +111,7 @@ The `config.json` file allows you to configure key parameters for deploying and 
       ],
       "providers": [
         {
-          "name": "aws",
+          "name": "AWS",
           "handler": "myHandler",
           "runtime": "python3.8",
           "regions": [
