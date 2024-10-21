@@ -37,10 +37,14 @@ class TerraformManager():
                 if prov == 'AWS':
                     credentials = AWSCredentials(credentials_path=credentials_path,key='aws_credentials')
                     deployer = awsProvider(credentials=credentials,region_func=region,module_folder_name='amazon')
+                    self.data_dict[prov] = deployer
+                    return
                 if prov == 'GCP':
                     credentials = GCPCredentials(credentials_path=credentials_path,key='gcp_credentials')
                     deployer = gcpProvider(credentials=credentials,region_func=region,module_folder_name='google')
-                self.data_dict[prov] = deployer
+                    self.data_dict[prov] = deployer
+                    return
+                raise ValueError(f"Provider{prov} is at the moment not avaiable!")
         except Exception as e:
             handle_error(f"Initalizing TerraformManager failed {e}")
     
@@ -104,14 +108,19 @@ class TerraformManager():
             with os.scandir(dest_path_folder) as entries:
                 for entry in entries:
                     if entry.is_file():
+                        print(entry.name)
                         os.unlink(entry.path)
                     if entry.name == 'modules':
                         continue
-                    else:
-                        shutil.rmtree(entry.path)
+                    elif entry.is_dir():
+                        try:
+                            shutil.rmtree(entry.path)
+                        except FileNotFoundError:
+                            print(f"Directory not found: {entry.path}")
             print("All files and subdirectories of terraform deleted successfully.")
-        except OSError:
+        except OSError as e:
             print("Error occurred while deleting files and subdirectories.")
+            print(e)
 
         
 

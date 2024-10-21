@@ -24,7 +24,7 @@ def save_input_with_execution(input_dict: dict, execution: int):
                 input_dict[key] = value
                 sys.exit(f"Json decoding of {input_dict} failed!")
 
-    save_json(input_dict,script_dir / 'runInput.json')
+    save_json(input_dict,script_dir / 'runInput.json',mode='w')
 
     return 'runInput.json'
 
@@ -37,14 +37,20 @@ def runner(workflow, input_json:str):
     for rep in range(repetition):
         input_file = save_input_with_execution(input_dict=input_dict, execution=rep+1)
 
+        cw = os.getcwd()
         command = ["java", "-jar", "ee.jar", script_dir / 'workflowData' / workflow, input_file]
         print(command)
         try:
+            os.chdir(script_dir)
             subprocess.run(command, check=True)
+            os.chdir(cw)
         except subprocess.SubprocessError as e:
+            os.chdir(cw)
             logging.error(f"AFCL failed with exit code {e.returncode}: {e}")
             sys.exit("Running Experiment failed")
-     
+
+
+ 
 
 def runExperiment():
     
@@ -69,5 +75,6 @@ def runExperiment():
 
         runner(workflow, input_json)
 
+    
 if __name__ == "__main__":
     runExperiment()

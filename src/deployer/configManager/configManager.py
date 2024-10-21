@@ -182,8 +182,6 @@ class ConfigManager:
 
                         use_bucket = function.get('useBucket', {})
                         use_output_bucket = use_bucket.get('useAsOutPutBucket', False)
-
-
                         input_file_paths = use_bucket.get('inputFilePaths', [])
                         new_function = Function(
                             handler=provider['handler'],

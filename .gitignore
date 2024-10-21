@@ -17,3 +17,5 @@
 /src/invoker/runInput.json
 terraform.tfstate
 terraform.tfstate.backup
+/src/.env
+/.env

@@ -55,3 +55,5 @@ streamlit-molstar==0.4.21
 streamlit_dynamic_filters==0.1.9
 SQLAlchemy==2.0.35
 SQLAlchemy-Utils==0.41.2
+pandas==2.2.2
+pandasgui==0.2.14

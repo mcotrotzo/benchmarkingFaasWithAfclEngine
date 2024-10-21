@@ -17,7 +17,11 @@
             "additionalInputParameters": [
                 { "name": "language", "type": "string", "value": "en-US" },
                 { "name": "inputFileCharacters", "type": "number", "value": 3000 },
-                { "name": "inputFileSize", "type": "number", "value": 3000 }
+                { "name": "inputFileSize", "type": "number", "value": 3000 },
+                {"name": "testCollectionOfInt", "type": "collection","value": [1,2,4]},
+                {"name": "testCollectionOfString", "type": "collection","value": ["3","3","5"]},
+                {"name": "testCollectionOfBool", "type": "collection","value": [true,false,true]}
+
 
             ],
             "additionalOutputParameters": [

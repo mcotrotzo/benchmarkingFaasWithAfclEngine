@@ -28,8 +28,8 @@
         {
           "name": "GCP",
           "regions": [
-            { "name": "us-east4", "concurrency": 16,"repetition": 1 },
-            { "name": "us-west1", "concurrency": 16,"repetition": 4 }
+            { "name": "us-east4", "concurrency": 2,"repetition": 1 },
+            { "name": "us-west1", "concurrency": 2,"repetition": 4 }
           ],
           "handler": "main.test_function",
           "runtime": "python3.9"
