@@ -72,3 +72,8 @@ provider "aws" {{
 }} 
 """
         return res
+    def credentials_afcl(self):
+        return f"""
+aws_access_key_id={self.credentials.access_key}
+aws_secret_access_key={self.credentials.secret_key}
+"""

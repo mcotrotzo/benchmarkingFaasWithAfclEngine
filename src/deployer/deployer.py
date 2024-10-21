@@ -7,7 +7,7 @@ from .awsProvider import awsProvider
 from .gcpProvider import gcpProvider
 from .configManager.configManager import ConfigManager
 from typing import Dict,List
-from ..utils.utils import save_json,handle_error
+from ..utils.utils import save_json,handle_error,save_properties_file
 from ..settings import CREDENTIALSPATH,CONFIG_PATH
 from dataclasses import dataclass
 import subprocess
@@ -23,6 +23,7 @@ class TerraformManager():
     data_dict = Dict[str,baseCloud]
     maintf:str
     providertf:list[str]
+    afcl_cred : str
     
     def __init__(self,config,credentials_path,dest_path_folder):
         try:
@@ -30,6 +31,7 @@ class TerraformManager():
             self.data_dict = {}
             self.maintf = ''
             self.providertf = []
+            self.afcl_cred = ''
             data = ConfigManager().parse_config(config)
             
             for prov,region in data.items():
@@ -47,14 +49,22 @@ class TerraformManager():
                 raise ValueError(f"Provider{prov} is at the moment not avaiable!")
         except Exception as e:
             handle_error(f"Initalizing TerraformManager failed {e}")
+
+    def copy_cred_afcl(self):
+        for prov in self.data_dict.keys():
+            deployer = self.data_dict[prov]
+            self.afcl_cred+=deployer.credentials_afcl()
     
     def produce_deployment(self):
         self.produce_required_provider()
         self.produce_module_calls()
         self.produce_providers()
+        self.copy_cred_afcl()
         try:
             self.save_content_as_tf_file(self.maintf,'main.tf')
             self.save_provider_content_as_tf_file(self.providertf,'providers.tf')
+            dir_path = Path(__file__).parent.parent
+            save_properties_file(file_path=dir_path / 'invoker/credentials.properties',content=self.afcl_cred)
         except Exception as e:
             handle_error(f"Error saving tf file: {e}")
     def produce_providers(self):

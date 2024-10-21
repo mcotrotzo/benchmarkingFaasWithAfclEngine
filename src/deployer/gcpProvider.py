@@ -67,3 +67,7 @@ provider "google" {{
 }}
 """
         return res
+    def credentials_afcl(self):
+        return f"""
+google_sa_key={self.credentials.__dict__}
+    """
