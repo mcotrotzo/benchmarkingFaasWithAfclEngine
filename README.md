@@ -4,12 +4,23 @@ This tool allows you to deploy, invoke, analyse and destroy cloud infrastructure
 The invocation is done using the xAfCL engine. You can benchmark your serverless application. This tool is for white box testing. You can add performance measurements to your serverless functions and return the value. The xAFCL engine stores the result in a MongoDB.
 You can specify the concurrency and repetition of the benchmark.
 ## Features
+- **Deploy** cloud functions and storage using Terraform.
 
-- **Deploy** cloud infrastructure using Terraform.
-- **Invoke** functions and services in the deployed environment with the xAFCL enactmentengine.
-- **Analyze** results by opening a `pandasgui` editor for user-driven analysis
+- **Invoke** functions and services in the deployed environment with the xAFCL[^1] enactment engine.
+
+- **Analyze**:
+    - **Analyze**:
+    - The analysis is performed using a custom-built graphical user interface (GUI) based on the Tkinter library.
+    - The GUI is powered by the Pandastable[^2] widget, allowing users to interact with and view data in a tabular format.
+
+    - **Additional Features**:
+      - **Plotly Plugin**: This feature enables users to create Plotly[^3] charts based on the data from the analysis, providing valuable visual insights into the benchmark results.
+      - **SQLite Query Plugin**: Users can perform custom SQL queries on the benchmarking data stored in SQLite format, enabling advanced filtering and analysis directly from the tool.
+
 - **Destroy** all deployed resources.
-- **All**: A complete cycle that performs deployment, invocation and analysis in sequence.
+
+- **All**: A complete cycle that performs deployment, invocation, and analysis in sequence.
+
 
 ## Prerequisites
 
@@ -170,3 +181,9 @@ MONGO_COLLECTION=
 CREDENTIALS_JSON_PATH=
 CONFIG_PATH=
 ```
+### Citation
+[^1]: Ristov, S., Pedratscher, S., & Fahringer, T. (2022). *xAFCL: Run Scalable Function Choreographies Across Multiple FaaS Systems*. 2022 IEEE World Congress on Services (SERVICES), Barcelona, Spain, 2022, pp. 32-32. DOI: [10.1109/SERVICES55459.2022.00045](https://doi.org/10.1109/SERVICES55459.2022.00045)
+
+[^2]: Farrell, D. (2016). *DataExplore: An Application for General Data Analysis in Research and Education*. Journal of Open Research Software, 4: e9. DOI: [http://dx.doi.org/10.5334/jors.94](http://dx.doi.org/10.5334/jors.94)
+
+[^3]: Plotly Technologies Inc., *Collaborative data science*, Plotly Technologies Inc., Montreal, QC, 2015. Available online at: [https://plot.ly](https://plot.ly)

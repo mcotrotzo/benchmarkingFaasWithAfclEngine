@@ -5,9 +5,13 @@ pandasql==0.7.3
 pandastable==0.13.1
 pymongo==4.10.1
 python-dotenv==1.0.1
-python_terraform==0.10.1
 SQLAlchemy==2.0.36
-SQLAlchemy_Utils==0.41.2
 plotly==5.24.1
-kaleido==0.1.0.*
 pillow==11.0.0
+future~=1.0.0
+tkinterweb~=3.24.7
+PyYAML~=6.0.2
+pymongo==4.10.1
+python-dotenv==1.0.1
+python_terraform==0.10.1
+kaleido == 0.1.0.post1
