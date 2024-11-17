@@ -28,14 +28,6 @@ class CustomTable(Table):
                          editable=editable, enable_menus=enable_menus, rows=rows, cols=cols, **kwargs)
         self.unbind_all("<Return>")
 
-    def test(self,event):
-        print(event.widget)
-    def import_dialog(self):
-        file_path = askopenfilename(defaultextension='.csv',title='Import csv file',filetypes=[("CSV Document","*.csv")])
-        if file_path:
-            df = pd.read_csv(file_path)
-            self.updateModel(TableModel(df))
-            self.redraw()
     def show(self, callback=None):
         super().show(callback=callback)
         if hasattr(self, 'toolbar'):
