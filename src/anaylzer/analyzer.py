@@ -1,5 +1,5 @@
 import tkinter
-from .plotly_integration.table import CustomTable
+from plotly_integration.table import CustomTable
 
 
 def focus(event,master):
