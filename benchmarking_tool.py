@@ -1,18 +1,16 @@
 import argparse
-import os
+
 from src.deployer.deployer import deploy,destroy
-import subprocess
+
 from src.invoker.scriptExperiment import runExperiment
 from src.mongo_to_csv_converter.mongoDB import returnDataframe
-import logging
-import streamlit as st
-from os.path import join, dirname
+
 from pathlib import Path
 import time
 from src.utils.utils import handle_error
 import pandas as pd
-from pandasgui import show
-import plotly.express as px
+from src.anaylzer.analyzer import App
+
 def parse_input():
     parser = argparse.ArgumentParser()
 
@@ -58,7 +56,8 @@ def tool():
             return
         
     if mode=='analyze' or mode=='all':
-        show(df)
+        app = App()
+        app.mainloop()
 
 if __name__ == "__main__":
     tool()

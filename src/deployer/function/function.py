@@ -32,8 +32,8 @@ class Function:
                  runtime: str,
                  input_files: List[str],
                  use_output_bucket:bool,
-                 additional_input_parameters: list[dict],
-                 additional_output_parameters: list[dict]
+                 additional_input_parameters: str,
+                 additional_output_parameters: str
                  ):
         self.archive = archive
         self.name = name

@@ -141,15 +141,15 @@ class ConfigManager:
     def __loadFromJson(self, config_json: str) -> dict:
             try:
                 config = load_config(config_json)
+                logging.info(f"Successfully loaded configuration from {config_json}.")
+                return config
             except FileNotFoundError as e:
                 handle_error(f"Config file not found {config_json}")
-                return
+
             except Exception as e:
                 handle_error(f"Error occured loading config file {e}")
-                return
-                
-            logging.info(f"Successfully loaded configuration from {config_json}.")
-            return config
+
+
 
     def parse_config(self, config_input: str) -> dict:
         try:
@@ -214,10 +214,6 @@ class ConfigManager:
 
 
     def select_by_type(self, input_params):
-        res = {}
-
-
-
 
         return  '[ ' + ', '.join(
                 f'{{ "name": "{param["name"]}","type": "{param["type"]}","value": jsonencode({json.dumps(param.get("value",""))})}}'
