@@ -5,8 +5,9 @@ import enum
 from typing import Dict, Tuple, List
 from tkinter.ttk import Combobox
 from tkinter import messagebox, commondialog
-from casting_expert import TypeInference
 import awesometkinter
+from tkinter.scrolledtext import ScrolledText
+import yaml
 
 
 class VariableType(enum.Enum):
@@ -113,7 +114,6 @@ class FormMember:
         if isinstance(self.var, BooleanVar):
             self.set_value(False)
 
-
     def _dis_enable(self):
         if not self.is_disabled:
             self.widget['state'] = 'disabled'
@@ -210,7 +210,7 @@ class PlotlyFormCreator:
                     continue
                 content[config_type][memb.id] = memb.get_value()
 
-            for param, value, _, selected_axis in self.saved_kwargs.get(config_type, []):
+            for param, value,selected_axis in self.saved_kwargs.get(config_type, []):
                 if selected_axis != '':
                     if selected_axis not in content[config_type]:
                         content[config_type][selected_axis] = {}
@@ -243,15 +243,15 @@ class PlotlyFormCreator:
             table_window = PanedWindow(dialog, orient='horizontal')
             table_window.pack(fill='both', expand=True)
 
-            table = tkinter.ttk.Treeview(table_window, columns=['parameter', 'value', 'type', 'selected_axis'],
+            table = tkinter.ttk.Treeview(table_window, columns=['parameter', 'value', 'selected_axis'],
                                          show='headings')
             table.heading('parameter', text='Parameter')
             table.heading('value', text='Value')
-            table.heading('type', text='Type')
             table.heading('selected_axis', text='Selected_Axis')
             table_window.add(table, stretch='always')
 
-            add_button = Button(table_window, text="Add Kwargs", command=lambda: self.ask_params(table, config_type,table_window))
+            add_button = Button(table_window, text="Add Kwargs",
+                                command=lambda: self.ask_params(table, config_type, table_window))
             table_window.add(add_button)
 
             clear_button = Button(table_window, text="Clear Row", command=lambda: self.clear_row(table, config_type))
@@ -259,7 +259,7 @@ class PlotlyFormCreator:
 
             if config_type in self.saved_kwargs.keys():
                 for param, value, type, axis_config in self.saved_kwargs[config_type]:
-                    table.insert("", "end", values=(param, value, type, axis_config))
+                    table.insert("", "end", values=(param, value,axis_config))
             table.get_children()
 
             self.table_entries[config_type] = (dialog, table, add_button, clear_button)
@@ -271,8 +271,7 @@ class PlotlyFormCreator:
             dialog.lift()
             dialog.focus_force()
 
-    def ask_params(self, table, config_type,window):
-        value = None
+    def ask_params(self, table, config_type, window):
         ask_axis_config = False
         axis_selected = StringVar()
         if config_type == ConfigTypes.LAYOUT:
@@ -284,11 +283,8 @@ class PlotlyFormCreator:
         param = tkinter.simpledialog.askstring(parent=table, title="Parameter", prompt="Enter parameter name:")
         if param is None:
             return
-
         try:
-            value = self._askValue(table,window)
-            if not value:
-                return
+            value = self._askValue(table, window)
         except Exception as e:
             messagebox.showerror("Type Error", f"An unexpected error occurred: {str(e)}", parent=table)
             return
@@ -297,33 +293,44 @@ class PlotlyFormCreator:
             for y_axis in eval(self.axis_list.get()):
                 if y_axis == 'all_y_axis' or y_axis == 'all_x_axis' or 'xaxis' in y_axis:
                     continue
-                table.insert("", "end", values=(param, value, type, y_axis))
+                table.insert("", "end", values=(param, value, y_axis))
                 if config_type not in self.saved_kwargs:
                     self.saved_kwargs[config_type] = []
-                self.add_kwargs(config_type, param, value, type, y_axis)
+                self.add_kwargs(config_type, param, value, y_axis)
             return
 
         if axis_selected.get() == 'all_x_axis':
             for x_axis in eval(self.axis_list.get()):
                 if x_axis == 'all_y_axis' or x_axis == 'all_x_axis' or 'yaxis' in x_axis:
                     continue
-                table.insert("", "end", values=(param, value, type, x_axis))
+                table.insert("", "end", values=(param, value, x_axis))
                 if config_type not in self.saved_kwargs:
                     self.saved_kwargs[config_type] = []
-                self.add_kwargs(config_type, param, value, type, x_axis)
+                self.add_kwargs(config_type, param, value, x_axis)
             return
 
-        table.insert("", "end", values=(param, value, type, axis_selected.get()))
+        table.insert("", "end", values=(param, value, axis_selected.get()))
         if config_type not in self.saved_kwargs:
             self.saved_kwargs[config_type] = []
-        self.add_kwargs(config_type, param, value, type, axis_selected.get())
-    def _askValue(self,parent,window,notes=None):
+        self.add_kwargs(config_type, param, value, axis_selected.get())
+
+    def _askValue(self, parent, window, notes=None):
+        result = StringVar()
         open_value_window = tkinter.Toplevel(window)
-        text = tkinter.Text(master=parent)
-        '''if type.lower() == 'list':
-            return self.ask_list_content(parent,window)
-        if type.lower() == 'dict':
-            return self.ask_dict_content(parent,window)'''
+        open_value_window.grab_set()
+        text = ScrolledText(master=open_value_window)
+        text.pack(fill='both', expand=True)
+
+        def submit(result: StringVar):
+            result.set(text.get("1.0", tkinter.END))
+            open_value_window.destroy()
+
+        submit_button = tkinter.Button(master=open_value_window, text="Submit", command=lambda: submit(result))
+        submit_button.pack(fill='x', side=tkinter.BOTTOM)
+
+        open_value_window.wait_window()
+        return yaml.safe_load(result.get())
+
     def clear_row(self, table, config_type):
         selected_item = table.selection()
         if selected_item:
@@ -332,12 +339,10 @@ class PlotlyFormCreator:
             if config_type in self.saved_kwargs and 0 <= item_index < len(self.saved_kwargs[config_type]):
                 self.saved_kwargs[config_type].pop(item_index)
 
-
-
-    def add_kwargs(self, config_type, param, value, type, notes):
+    def add_kwargs(self, config_type, param, value, notes):
         if config_type not in self.saved_kwargs:
             self.saved_kwargs[config_type] = []
-        self.saved_kwargs[config_type].append((param, value, type, notes))
+        self.saved_kwargs[config_type].append((param, value, notes))
 
     def open_axis_config_dialog(self, axis_selected: StringVar = None):
         dialog = tkinter.Toplevel()
@@ -368,7 +373,7 @@ class PlotlyFormCreator:
         return axis_selected
 
     def update_axis_combobox(self, select_axis):
-        print(select_axis)
+
         if select_axis and select_axis.winfo_exists():
             select_axis['values'] = eval(self.axis_list.get())
 
@@ -376,86 +381,3 @@ class PlotlyFormCreator:
         axis_selected.set(select_axis.get() if select_axis.winfo_exists() else "")
         self.axis_list.trace_remove("write", trace_id)
         dialog.destroy()
-
-
-    def ask_list_content(self, table, window):
-        list_content = []
-        list_window = tkinter.Toplevel(table)
-        list_window.grab_set()
-
-        label = tkinter.Label(master=list_window, text="List")
-        label.pack(fill=tkinter.X, side=tkinter.TOP)
-
-        listbox = tkinter.Listbox(master=list_window)
-        listbox.pack(fill=tkinter.BOTH, expand=True, side=tkinter.TOP)
-
-        def add_element():
-            value = self._askValue(list_window, self.ask_type(list_window), window)
-            if value:
-                listbox.insert(tkinter.END, value)
-                list_content.append(value)
-
-        def remove_element():
-            selected_item_index = listbox.curselection()
-            if selected_item_index:
-                listbox.delete(selected_item_index)
-                list_content.pop(selected_item_index[0])
-
-
-
-        add_button = tkinter.Button(master=list_window, text="Add Element", command=add_element)
-        add_button.pack()
-
-        remove_button = tkinter.Button(master=list_window, text="Remove Element", command=remove_element)
-        remove_button.pack()
-
-        list_window.wait_window()
-        return list_content
-
-
-    def ask_type(self,parent):
-        type = tkinter.simpledialog.askstring(
-            "Type", "Enter the type (int, string, double, bool,none,list,dict):", parent=parent)
-
-
-        if not type or type.lower() not in ['int', 'string', 'double', 'bool', 'none','list','dict']:
-            return 'none'
-        return type.lower()
-    def ask_dict_content(self, table,window):
-        dict_content = {}
-        list_window = tkinter.Toplevel(table)
-        list_window.grab_set()
-
-        label = tkinter.Label(master=list_window, text="Dict")
-        label.pack(fill=tkinter.X, side=tkinter.TOP)
-
-        listbox = tkinter.Listbox(master=list_window)
-        listbox.pack(fill=tkinter.BOTH, expand=True, side=tkinter.TOP)
-
-        def add_element():
-            key = self._askValue(list_window, self.ask_type(list_window), window,'Key')
-            value = self._askValue(list_window,self.ask_type(list_window), window,'Key')
-            if key and value:
-                listbox.insert(tkinter.END, (key,value))
-                dict_content[key] = value
-
-        def remove_element():
-            selected_item_index = listbox.curselection()
-            if selected_item_index:
-                selected_item = listbox.get(selected_item_index)
-                if isinstance(selected_item, tuple):
-                    key, value = selected_item
-                    listbox.delete(selected_item_index)
-                    dict_content.pop(key, None)
-
-        add_button = tkinter.Button(master=list_window, text="Add Element", command=add_element)
-        add_button.pack()
-
-        remove_button = tkinter.Button(master=list_window, text="Remove Element", command=remove_element)
-        remove_button.pack()
-
-        list_window.wait_window()
-        return dict_content
-
-
-
