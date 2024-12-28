@@ -151,6 +151,7 @@ def deploy(dest_terraform_path_folder: str):
         if state[0] != 0:
             raise Exception()
     except Exception as e:
+        print(e)
         handle_error(f"Deployment error: {e}")
     return manager
 

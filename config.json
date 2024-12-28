@@ -2,41 +2,132 @@
     "functions": [
         {
 
-            "name": "TestFunction",
-            "archive": "C:/Users/MarcoCotrotzo/IdeaProjects/benchmarkingFaasWithAfclEngine/my_lambda_function.zip",
+            "name": "SynthesizeExp",
+            "archive": "C:/Users/MarcoCotrotzo/IdeaProjects/profileBaaS/synthesize/target/deployable/synthesize-1.0-SNAPSHOT.jar",
             "timeout": 500,
             "memory": 512,
-            "inputFiles": [
-                "inputFile.txt"
-            ],
             "useBucket": {
                 "useAsOutPutBucket": true,
-                "useAsInputBucket": false
+                "useAsInputBucket": false,
+                "inputFilePaths": ["C:/Users/MarcoCotrotzo/IdeaProjects/profileBaaS/inputFIles/inputFile.txt"]
 
             },
             "additionalInputParameters": [
                 { "name": "language", "type": "string", "value": "en-US" },
                 { "name": "inputFileCharacters", "type": "number", "value": 3000 },
-                { "name": "inputFileSize", "type": "number", "value": 3000 },
-                {"name": "testCollectionOfInt", "type": "collection","value": [1,2,4]},
-                {"name": "testCollectionOfString", "type": "collection","value": ["3","3","5"]},
-                {"name": "testCollectionOfBool", "type": "collection","value": [true,false,true]}
-
-
+                { "name": "inputFileSize", "type": "number", "value": 3000 }
             ],
             "additionalOutputParameters": [
-                { "name": "succeed", "type": "bool" }
-
+                { "name": "inputFileCharacters", "type": "number"},
+                { "name": "inputFileSize", "type": "number"},
+                { "name": "downloadTime", "type": "number" },
+                { "name": "executionTime", "type": "number" },
+                { "name": "serviceTime", "type": "number" },
+                { "name": "uploadTime", "type": "number" },
+                { "name": "coldStart", "type": "string" },
+                { "name": "startExecutionTime", "type": "string" },
+                { "name": "endExecutionTime", "type": "string" },
+                { "name": "containerID", "type": "string" }
             ],
             "providers": [
                 {
                     "name": "AWS",
                     "regions": [
-                        { "name": "us-east-1", "concurrency": 1,"repetition": 1 },
-                        { "name": "us-west-2", "concurrency": 1,"repetition": 4 }
+                        { "name": "us-east-1 ", "concurrency": 10,"repetition": 5 },
+                        { "name": "eu-west-2", "concurrency": 10,"repetition": 5 },
+                        { "name": "us-west-2", "concurrency": 10,"repetition": 5  },
+                        { "name": "eu-central-1", "concurrency": 10,"repetition": 5 },
+                        { "name": "ap-northeast-2", "concurrency": 10,"repetition": 5  },
+                        { "name": "ap-southeast-2", "concurrency": 10,"repetition": 5 }
                     ],
-                    "handler": "main.lambda_handler",
-                    "runtime": "python3.10"
+                    "handler": "function.SynthesizeFunction",
+                    "runtime": "java17"
+                }
+            ]
+        },
+        {
+            "name": "ExtractExp",
+            "archive": "C:/Users/MarcoCotrotzo/IdeaProjects/profileBaaS/extract/target/deployable/extract-1.0-SNAPSHOT.jar",
+            "timeout": 500,
+            "memory": 512,
+            "useBucket": {
+                "useAsOutPutBucket": true,
+                "useAsInputBucket": true,
+                "inputFilePaths": ["C:/Users/MarcoCotrotzo/IdeaProjects/profileBaaS/inputFIles/inputFile.pdf"]
+
+            },
+            "additionalInputParameters": [
+                { "name": "inputFilePDFPages", "type": "number", "value": 1 },
+                { "name": "inputFileSize", "type": "number", "value": 30980 }
+            ],
+            "additionalOutputParameters": [
+                { "name": "inputFilePDFPages", "type": "number" },
+                { "name": "responseTextSize", "type": "number" },
+                { "name": "isInputFileLocal", "type": "string" },
+                { "name": "inputFileSize", "type": "number" },
+                { "name": "downloadTime", "type": "number" },
+                { "name": "executionTime", "type": "number" },
+                { "name": "serviceTime", "type": "number" },
+                { "name": "uploadTime", "type": "number" },
+                { "name": "coldStart", "type": "string" },
+                { "name": "startExecutionTime", "type": "string" },
+                { "name": "endExecutionTime", "type": "string" },
+                { "name": "containerID", "type": "string" }
+            ],
+            "providers": [
+                {
+                    "name": "AWS",
+                    "regions": [
+                        { "name": "us-east-1", "concurrency": 25,"repetition": 5 }
+                    ],
+                    "handler": "function.ExtractFunction",
+                    "runtime": "java17"
+                }
+            
+            ]
+        },
+        {
+            "name": "RecognitionExp",
+            "archive": "C:/Users/MarcoCotrotzo/IdeaProjects/profileBaaS/recognitionFunc/target/deployable/recognitionFunc-1.0-SNAPSHOT.jar",
+            "timeout": 500,
+            "memory": 512,
+            "useBucket": {
+                "useAsOutPutBucket": true,
+                "useAsInputBucket": true,
+                "inputFilePaths": ["C:/Users/MarcoCotrotzo/IdeaProjects/profileBaaS/inputFIles/inputFile.wav"]
+
+            },
+            "additionalInputParameters": [
+                { "name": "inputFileAudioLength", "type": "number", "value": 62.976 },
+                { "name": "language", "type": "string", "value": "en-US" },
+                { "name": "inputFileSize", "type": "number", "value": 2015310 }
+            ],
+            "additionalOutputParameters": [
+                { "name": "inputFileAudioLength", "type": "number" },
+                { "name": "isInputFileLocal", "type": "string" },
+                { "name": "inputFileSize", "type": "number" },
+                { "name": "downloadTime", "type": "number" },
+                { "name": "executionTime", "type": "number" },
+                { "name": "serviceTime", "type": "number" },
+                { "name": "uploadTime", "type": "number" },
+                { "name": "coldStart", "type": "string" },
+                { "name": "startExecutionTime", "type": "string" },
+                { "name": "endExecutionTime", "type": "string" },
+                { "name": "containerID", "type": "string" }
+            ],
+            "providers": [
+                {
+                    "name": "AWS",
+                    "regions": [
+                        { "name": "us-east-1", "concurrency": 25,"repetition": 5 },
+                        { "name": "eu-west-2", "concurrency": 25,"repetition": 5 },
+                        { "name": "us-west-2", "concurrency": 25,"repetition": 5  },
+                        { "name": "eu-central-1", "concurrency": 25,"repetition": 5 },
+                        { "name": "ap-northeast-2", "concurrency": 25,"repetition": 5  },
+                        { "name": "ap-southeast-2", "concurrency": 25,"repetition": 5 }
+                    ],
+                    "handler": "function.RecognitionFunction",
+                    "runtime": "java17"
                 }
             ]
         }

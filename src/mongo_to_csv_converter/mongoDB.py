@@ -30,6 +30,13 @@ class MongoDBConnection:
         return data.find(filter_query)
     
     
+def flatten_data(df: pd.DataFrame):
+    
+    df['output_execution'] = df.apply(lambda x: df[df['workflow_id'] == x['workflow_id']]['workflowInput_execution'].values[0] if 'workflowInput_execution' in x else None, axis=1)
+    df['Concurrency'] = df.apply(lambda x: df[df['workflow_id'] == x['workflow_id']]['workflowInput_concurrency'].values[0] if 'workflowInput_concurrency' in x else None, axis=1)
+    df['output_region'] = df.apply(lambda x: df[df['workflow_id'] == x['workflow_id']]['workflowInput_region'].values[0] if 'workflowInput_region' in x else None, axis=1)
+    df['output_provider'] = df.apply(lambda x: df[df['workflow_id'] == x['workflow_id']]['workflowInput_provider'].values[0] if 'workflowInput_provider' in x else None, axis=1)
+    return df
 
 def returnDataframe():
     mn = MongoDBConnection(host=HOST, username=USERNAME, password=PASSWORD, port=int(PORT), database=DATABASE)
@@ -51,6 +58,8 @@ def returnDataframe():
         dataframe = pd.concat([dataframe.drop(columns=[col]), normalized_data], axis=1)
     
    
-    return dataframe
+    return flatten_data(dataframe)
     
 
+def main():
+    returnDataframe()

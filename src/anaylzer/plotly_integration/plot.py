@@ -1,254 +1,183 @@
-import tkinter.filedialog
-from .formcreator import FormMember, PlotlyFormCreator, ConfigTypes, VariableType,Customframe
-import tkinter as tk
-from tkinter.ttk import Combobox, Checkbutton,Radiobutton
-from tkinter import messagebox,StringVar,IntVar,colorchooser
-from PIL import Image, ImageTk
-from typing import final
-import tempfile
+import streamlit as st
+import plotly.express as px
+import pandas as pd
+import yaml
+from dataclasses import dataclass
+from typing import Union
 
 
-class Plot:
-    def __init__(self, parent_app):
-        self.individual_config = None
-        self.color_map = {}
-        self.image_label = None
-        self.image_copy = None
-        self.img = None
-        self.update_y_frame = None
-        self.update_x_frame = None
-        self.layout_options_frame = None
-        self.y_axis_options = None
-        self.x_axis_options = None
-        self.layout_options = None
-        self.plot_options = None
-        self.plot_options_frame = None
-        self.layout_form = None
-        self.config_frame = None
-        self.left_frame = None
-        self.paned_window = None
-        self.parent_app = parent_app
-        self.tkimage = None
+
+class BasePlot:
+    def __init__(self, df, container,sheet_key):
+        self.df = df
+        self.sheet_key = sheet_key
+       
+        self.plot_options = {}
+        self.layout_options = {}
+        self.plot_kwargs_options = {}
+        self.layout_kwargs_options = {}
+        
+        self.container = container
         self.fig = None
-        self.color_window = None
-        self.config_window = None
-        self.config_axes_button_text = StringVar()
-        self.config_axes_button_text.set('Config Axes')
+        
+        self.unshared_x_axis = False
+        self.unshared_y_axis = False
+        self.show_x_tick_labels = False
+        self.show_y_tick_labels = False
+  
+    
+    
+    def get_layout_options(self):
+        self.layout_options['height'] = st.slider("Height", 400, 900, 600, key=f"{self.sheet_key}height")
+        self.layout_options['width'] = st.slider("Width", 400, 1200, 900, key=f"{self.sheet_key}width")
+        self.layout_options['title'] = st.text_input("Plot Title", "My Plot", key=f"{self.sheet_key}title")
+        self.unshared_x_axis = st.checkbox(label="Shared X",value=False,key=f"{self.sheet_key}_shared_x")
+        self.unshared_y_axis = st.checkbox(label="Shared Y",value=False,key=f"{self.sheet_key}_shared_y")
+        self.show_x_tick_labels = st.checkbox(label="ShowTickLabels X",value=False,key=f"{self.sheet_key}_tick_label_x")
+        self.show_y_tick_labels = st.checkbox(label="ShowTickLabels Y",value=False,key=f"{self.sheet_key}_tick_label_y")
 
-    def open_configuration_window(self):
-        if self.config_window is None or not self.config_window.winfo_exists():
-            self.config_window = tk.Toplevel(self.parent_app)
-            self.config_window.geometry('600x400')
+    def get_plot_options(self):
+        self.plot_options['x'] = st.selectbox("X-Axis", options=[None] + list(self.df.columns), key=f"{self.sheet_key}x_axis")
+        self.plot_options['y'] = st.selectbox("Y-Axis", options=[None] + list(self.df.columns), key=f"{self.sheet_key}y_axis")
+        self.plot_options['color'] = st.selectbox("Color", options=[None] + list(self.df.columns), key=f"{self.sheet_key}color")
+        self.plot_options['facet_row'] = st.selectbox("Facet_Row", options=[None] + list(self.df.columns), key=f"{self.sheet_key}facet_row")
+        self.plot_options['facet_col'] = st.selectbox("Facet Col", options=[None] + list(self.df.columns), key=f"{self.sheet_key}facet_col")
+        
+        self.create_color_asker('color')
+        
+    def create_color_asker(self,color):
+        color_column = st.session_state.get(f"{self.sheet_key}{color}",None)
+       
+        if color_column:
+            unique_categories = self.df[color_column].dropna().unique()
+            category_colors = self.plot_options['color_discrete_map'] if 'color_discrete_map' in self.plot_options else {}
 
-            self.main_frame = tk.Frame(self.config_window)
-            self.main_frame.pack(side='top', fill='both', expand=True)
+            st.write("Customize Colors for Categories")
+            for category in unique_categories:
+                color_key = f"{self.sheet_key}_color_{category}"
+                category_colors[category] = st.color_picker(f"Color for {category}", category_colors.get(category, "#000000"), key=f'{color_key}{self.sheet_key}')
 
+          
+            self.plot_options['color_discrete_map'] = category_colors
 
-            self.left_scrollable = Customframe(self.main_frame)
-            self.plot_scrollable = Customframe(self.main_frame)
-            self.right_scrollable = Customframe(self.main_frame)
+    def get_form(self):
+        with self.container:
+            form = st.form(key=f"{self.sheet_key}Plotly Form")
+            col1, col2 = form.columns(2)
+            with form:
+                with col1:
+                    st.write("Plot Configurations")
+                    self.get_plot_options()
 
+                with col2:
+                    st.write("Layout Configurations")
+                    self.get_layout_options()
 
-            self.left_scrollable.pack(side='left', fill=tk.Y, expand=False)
-            self.right_scrollable.pack(side='right', fill=tk.Y, expand=False)
-            self.plot_scrollable.pack(side='top', fill=tk.BOTH, expand=True)
-
-
-            config_windos = {
-                ConfigTypes.PLOT: self.left_scrollable,
-                ConfigTypes.LAYOUT: self.right_scrollable
-            }
-
-
-            self.plot_options = PlotlyFormCreator(
-                submit_command=self.create_plot, frames=config_windos, frame_for_submit_button=self.plot_scrollable
-            )
-
-        self.config_window.lift()
-        self._create_config_window()
-
-
-    def _create_config_window(self):
-        self.get_plot_configuration()
-        self.get_layout_configuration()
-        self.plot_options.create_form()
-
-    def set_x_field(self):
-
-        self.plot_options.create_form_member(widget_type=Combobox, id='x', title='X_Value',
-                                             values=self.parent_app.model.df.columns.tolist(),
-                                             textvariable=StringVar(),
-                                             config_type = ConfigTypes.PLOT
-                                             )
-
-    def set_y_field(self):
-        self.plot_options.create_form_member(widget_type=Combobox, id='y', title='Y_Value',
-                                             values=self.parent_app.model.df.columns.tolist(),
-                                             textvariable=StringVar(),
-                                             config_type = ConfigTypes.PLOT
-                                             )
-
-    def set_facet_row(self):
-        self.plot_options.create_form_member(widget_type=Combobox, id='facet_row', title='Facet_Row',
-                                             values=self.parent_app.model.df.columns.tolist(),
-                                             textvariable=StringVar(),
-                                             config_type = ConfigTypes.PLOT
-                                             )
-
-    def set_facet_col(self):
-        self.plot_options.create_form_member(widget_type=Combobox, id='facet_col', title='Facet_Col',
-                                             values=self.parent_app.model.df.columns.tolist(),
-                                             textvariable=StringVar(),
-                                             config_type = ConfigTypes.PLOT
-                                             )
-    def set_color_field(self):
-        self.plot_options.create_form_member(widget_type=Combobox, id='color', title='Color',
-                                             values=self.parent_app.model.df.columns.tolist(),
-                                             textvariable=StringVar(),
-                                             config_type = ConfigTypes.PLOT
-                                             )
-    def set_color_discrete_map(self):
-        color_widget = self.plot_options.get_widget(ConfigTypes.PLOT,'color')
-        if not color_widget:
-            return
-        if hasattr(self,'menu_bar') and self.menu_bar:
-            self.menu_bar.destroy()
-            self.color_map = {}
-
-        color_widget.add_bind('<<ComboboxSelected>>',lambda event: self.color_discrete_command(color_widget.get_value()))
-        color_widget.add_bind('<Configure>', lambda event: self.handle_color_widget_state(color_widget))
-
-
-    def handle_color_widget_state(self, color_widget):
-        if color_widget.get_is_disabled():
-            if hasattr(self,'menu_bar') and self.menu_bar:
-                self.menu_bar.destroy()
-                self.color_map = {}
-
-    def color_discrete_command(self,selected_color):
-        if not selected_color:
-            return
-        unique_values = self.parent_app.model.df[selected_color].dropna().unique()
-        self.color_map = {}
-        if hasattr(self,'menu_bar') and self.menu_bar:
-            self.menu_bar.destroy()
-
-        self.menu_bar = tk.Menu(self.config_window, tearoff=0)
-        self.config_window['menu'] = self.menu_bar
-        self.color_menu = tk.Menu(self.menu_bar)
-        self.menu_bar.add_cascade(label="Change Color of color categories",menu=self.color_menu)
-        for value in unique_values:
-            self.color_menu.add_command(label=f"Choose color for '{value}'", command=lambda val=value:self.select_color(val))
-    def select_color(self,value):
-        color = colorchooser.askcolor(parent=self.config_window,title=f"Choose color for '{value}'")[1]
-        if color:
-            self.color_map[value] = color
-
-
-    def set_height_field(self):
-        self.plot_options.create_form_member(
-            widget_type=tk.Scale, title="Figure Height",
-            variable=IntVar(),
-            from_=500, to=913, id='height',
-            orient='horizontal',config_type=ConfigTypes.LAYOUT
-        )
-
-    def set_width_field(self):
-        self.plot_options.create_form_member(
-            widget_type=tk.Scale, title="Figure Width",
-            variable=IntVar(),
-            from_=500, to=1600, id='width',
-            orient='horizontal',config_type=ConfigTypes.LAYOUT
-        )
-
-    def set_title_field(self):
-        self.plot_options.create_form_member(
-            widget_type=tk.Entry, title="Plot Title",
-            textvariable =StringVar(),
-            id='title',config_type=ConfigTypes.LAYOUT
-        )
-
-
-    def get_plot_configuration(self):
-        self.set_x_field()
-        self.set_y_field()
-        self.set_facet_row()
-        self.set_facet_col()
-        self.set_color_field()
-        self.set_color_discrete_map()
-
-    def get_layout_configuration(self):
-        self.set_height_field()
-        self.set_width_field()
-        self.set_title_field()
-
-
+                submitted = st.form_submit_button(label=f"Plot")
+                
     def get_plotly_function(self):
-        pass
-    @final
-    def plot_setting(self,plot_options,layout_options):
+        """Must be implemented in subclasses."""
+        raise NotImplementedError
+
+    def render(self):
+       
+       
+        if not self.plot_options and not self.layout_options:
+            self.container.warning("Please configure the plot.")
+            return
+
+        plot_func = self.get_plotly_function()
+
+        self.container.write(str(self.plot_options))
+        self.container.write(str(self.layout_options))
+        
+    
         try:
-            if hasattr(self,'color_map') and self.color_map:
-                self.fig = self.get_plotly_function()(self.parent_app.model.df,color_discrete_map=self.color_map, **plot_options)
-            else:
-                self.fig = self.get_plotly_function()(self.parent_app.model.df, **plot_options)
-
-            if self.fig:
-                self.fig.update_layout(**layout_options)
-                self.plot_image(self.fig)
-
+            fig = plot_func(self.df, **self.plot_options,**self.plot_kwargs_options)
+            fig.update_layout(**self.layout_options,**self.layout_kwargs_options)
+            
+            
+            if self.unshared_x_axis:
+                fig.for_each_xaxis(lambda xaxis: xaxis.update(matches=None,showticklabels = self.show_x_tick_labels))
+            if self.unshared_y_axis:
+                fig.for_each_yaxis(lambda xaxis: xaxis.update(matches=None,showticklabels = self.show_y_tick_labels))
+            self.container.plotly_chart(fig,key=f'Plotly{self.sheet_key}')
+            
+   
         except ValueError as e:
             if "wide-form data" in str(e):
-                messagebox.showwarning(
-                    title="Plot Creation Error",
-                    message="It seems that columns have different data types because no x and y values were selected.\n\n"
-                            "To avoid this error:\n"
-                            "- Ensure at least one x or y value is selected.\n"
-                            "- When x and y are empty, the index will be used as x, and all other columns will be used as y.\n"
-                            "- If columns have different types, adjust them to be compatible for plotting.",
-                    parent=self.config_window,
-                )
+                self.container.warning("Plot Creation Error: Ensure compatible data types or select X/Y values.")
             else:
-                messagebox.showwarning(title="Plot Creation Error",message=str(e),parent=self.config_window)
+                self.container.warning(f"Plot Creation Error: {e}")
         except Exception as e:
-            messagebox.showwarning(title="Plot Creation Error",message=str(e),parent=self.config_window)
-
-    def plot_image(self,fig):
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as png:
-            png_path = png.name
-            png.write(fig.to_image())
-        img = ImageTk.PhotoImage(Image.open(png_path))
-        png.close()
-        if hasattr(self,'plot') and self.plot and self.plot.winfo_exists():
-            self.plot.configure(image=img)
-            self.plot.image = img
-        else:
-            self.plot = tk.Label(self.plot_scrollable, image=img)
-            self.plot.image = img
-            self.plot_scrollable.add(self.plot)
-        if not hasattr(self,'download_button') or not self.download_button:
-            self.download_button = tkinter.Button(master=self.plot_scrollable,text="Open in browser to download the plot",
-                                                  command=self.open_fig_as_html)
-            self.plot_scrollable.add(self.download_button)
-
-    def open_fig_as_html(self):
-        if self.fig:
-            self.fig.show()
-    @final
-    def create_plot(self, content,axis:StringVar):
-        plot_options = content[ConfigTypes.PLOT]
-        layout_options = content[ConfigTypes.LAYOUT]
-        self.plot_setting(plot_options,layout_options)
-        if self.fig:
-            axis.set(str(sorted([e for e in self.fig.layout if e[1:5] == 'axis']+['all_x_axis','all_y_axis'])))
+            self.container.warning(f"Error rendering plot: {e}")
 
 
+class BoxPlot(BasePlot):
+    def get_plotly_function(self):
+        return px.box
 
+class HistPlot(BasePlot):
+    def get_plot_options(self):
+       
+        super().get_plot_options()
+        self.plot_options['histnorm'] = st.selectbox("Histnorm", options=[None] + ['percent', 'probability', 'density', 'probability density'], key=f"{self.sheet_key}histnorm")
+        self.plot_options['histfunc'] = st.selectbox("Histfunc", options=[None] + ['count', 'sum', 'avg', 'min', 'max'], key=f"{self.sheet_key}histfunc")
+    def get_plotly_function(self):
+        return px.histogram
 
+class TimeLinePlot(BasePlot):
+    def get_plot_options(self):
+       
+        self.plot_options['x_start'] = st.selectbox("X-Start", options=[None] + list(self.df.columns), key=f"{self.sheet_key}x_start")
+        self.plot_options['x_end'] = st.selectbox("X-End", options=[None] + list(self.df.columns), key=f"{self.sheet_key}x_end")
+        self.plot_options['y'] = st.selectbox("Y-Axis", options=[None] + list(self.df.columns), key=f"{self.sheet_key}y_axis")
+        self.plot_options['color'] = st.selectbox("Color", options=[None] + list(self.df.columns), key=f"{self.sheet_key}color")
+        self.plot_options['facet_row'] = st.selectbox("Facet_Row", options=[None] + list(self.df.columns), key=f"{self.sheet_key}facet_row")
+        self.plot_options['facet_col'] = st.selectbox("Facet Col", options=[None] + list(self.df.columns), key=f"{self.sheet_key}facet_col")
+        self.create_color_asker('color')
+      
+        
+    def get_plotly_function(self):
+        return px.timeline
 
+class LinePlot(BasePlot):
+    def get_plotly_function(self):
+        return px.line
 
+class ScatterPlot(BasePlot):
+    def get_plotly_function(self):
+        return px.scatter
+    
+class ScatterPlot3D(BasePlot):
+    
+    def get_plot_options(self):
+       
+        self.plot_options['x'] = st.selectbox("X-Start", options=[None] + list(self.df.columns), key=f"{self.sheet_key}x_start")
+        self.plot_options['y'] = st.selectbox("Y-Axis", options=[None] + list(self.df.columns), key=f"{self.sheet_key}y_axis")
+        self.plot_options['z'] = st.selectbox("Z-Axis", options=[None] + list(self.df.columns), key=f"{self.sheet_key}z_axis")
+        self.plot_options['color'] = st.selectbox("Color", options=[None] + list(self.df.columns), key=f"{self.sheet_key}color")
+        self.create_color_asker('color')
+    def get_plotly_function(self):
+        return px.scatter_3d
+    
+class BarPlot(BasePlot):
+    def get_plotly_function(self):
+        return px.bar
 
-
-
+class PiePlot(BasePlot):
+    def get_plot_options(self):
+        self.plot_options['values'] = st.selectbox("Values", options=[None] + list(self.df.columns), key=f"{self.sheet_key}values")
+        self.plot_options['names'] = st.selectbox("Names", options=[None] + list(self.df.columns), key=f"{self.sheet_key}names")
+        self.plot_options['color'] = st.selectbox("Color", options=[None] + list(self.df.columns), key=f"{self.sheet_key}color")
+        self.plot_options['facet_row'] = st.selectbox("Facet_Row", options=[None] + list(self.df.columns), key=f"{self.sheet_key}facet_row")
+        self.plot_options['facet_col'] = st.selectbox("Facet Col", options=[None] + list(self.df.columns), key=f"{self.sheet_key}facet_col")
+        self.create_color_asker('color')
+    def get_plotly_function(self):
+        return px.pie
+    
+class ViolinPlot(BasePlot):
+    def get_plotly_function(self):
+        return px.violin
 
 

@@ -1,22 +1,36 @@
-import tkinter
-from plotly_integration.table import CustomTable
+from plotly_integration.sheet import SheetManager
+import streamlit as st
+def main():
+    st.set_page_config(
+        page_title="Anaylzer",
+        page_icon="🌟",
+        layout="wide",
+        initial_sidebar_state="expanded"
+        )
+    st.markdown(
+        r"""
+        <style>
+        .stAppDeployButton {
+                visibility: hidden;
+            }
+        </style>
+        """, unsafe_allow_html=True
+    )
+    
+    st.markdown("""
+    <style>
+        .reportview-container {
+            margin-top: -2em;
+        }
+        #MainMenu {visibility: hidden;}
+        .stDeployButton {display:none;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+    </style>
+""", unsafe_allow_html=True)
+    st.title("Analyzer")
+    sheet_maanger = SheetManager()
+    sheet_maanger.load()
 
-
-def focus(event,master):
-    widget = master.focus_get()
-    print(widget, "has focus")
-class App(tkinter.Tk):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        main_container = tkinter.Frame(self)
-        main_container.pack(side="top", fill="both", expand=True)
-
-
-        self.table = CustomTable(parent=main_container,showtoolbar=True,showtooltip=True)
-        self.table.show()
-
-
-if __name__ == '__main__':
-    app = App()
-    app.mainloop()
+if __name__ == "__main__":
+    main()
